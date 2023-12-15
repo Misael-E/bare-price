@@ -30,6 +30,19 @@ export function extractPrice(...elements: any) {
 	return "";
 }
 
+export function extractReviewsCount(...elements: any) {
+	for (const element of elements) {
+		const reviewCount = element.text().trim();
+
+		if (reviewCount) {
+			const cleanPrice = reviewCount.replace(/[^\d.]/g, "");
+			return cleanPrice;
+		}
+	}
+
+	return "";
+}
+
 // Extracts and returns the currency symbol from an element.
 export function extractCurrency(element: any) {
 	const currencyText = element.text().trim().slice(0, 1);

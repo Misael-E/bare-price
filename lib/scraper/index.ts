@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { extractCurrency, extractPrice } from "../utils";
+import { extractCurrency, extractPrice, extractReviewsCount } from "../utils";
 import { PriceHistoryItem } from "@/types";
 
 export async function scrapeAmazonProduct(url: string) {
@@ -57,6 +57,20 @@ export async function scrapeAmazonProduct(url: string) {
 			.text()
 			.replace(/[-%]/g, "");
 
+		const reviewsCount = extractReviewsCount(
+			$("#acrCustomerReviewText").first()
+		);
+
+		const stars = $("#acrPopover span.a-size-base.a-color-base")
+			.first()
+			.text()
+			.trim();
+
+		const recommendPercent = $(".a-histogram-row td.a-text-right")
+			.first()
+			.text()
+			.replace(/\D/g, "");
+
 		const data = {
 			url,
 			currency: currency || "$",
@@ -67,8 +81,9 @@ export async function scrapeAmazonProduct(url: string) {
 			priceHistory: [] as PriceHistoryItem[],
 			discountRate: Number(discountRate),
 			category: "category",
-			reviewsCount: 100,
-			stars: 4.5,
+			reviewsCount: Number(reviewsCount),
+			stars: Number(stars),
+			recommendPercent: Number(recommendPercent),
 			isOutOfStock: outOfStock,
 			lowestPrice: Number(currentPrice) || Number(originalPrice),
 			highestPrice: Number(originalPrice) || Number(currentPrice),
